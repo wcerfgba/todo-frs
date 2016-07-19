@@ -1,0 +1,17 @@
+{
+  "name": "todo-frs",
+  "version": "1.0.0",
+  "description": "todo-frs ========",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "gulp": "^3.9.1"
+  }
+}
