@@ -5,6 +5,8 @@ namespace AppBundle\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
 use FOS\RestBundle\Controller\FOSRestController;
+use AppBundle\Entity\Task;
+use AppBundle\Form\TaskType;
 
 class APIController extends FOSRestController
 {
@@ -26,14 +28,50 @@ class APIController extends FOSRestController
     /**
      * @Post("/new", name="api_new")
      */
-    public function newAction()
+    public function newAction(Request $request)
     {
+        $task = new Task();
+        $form = $this->createForm(TaskType::class, $task);
+        $form->handleRequest($request);
+
+        if ($form->isValid())
+        {
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($task);
+            $em->flush();
+
+            $view = $this->view($task, 200);
+
+            return $this->handleView($view);
+        }
+
+        $view = $this->view($form, 400);
+
+        return $this->handleView($view);
     }
 
     /**
      * @Delete("/{id}", name="api_delete", requirements={ "id": "\d+" })
      */
-    public function deleteAction()
+    public function deleteAction($id)
     {
+        $em = $this->getDoctrine()->getManager();
+        $task = $em->getRepository('AppBundle:Task')->find($id);
+
+        if ($task === null)
+        {
+            $error = array( 'error' => "Task with id $id not found." );
+
+            $view = $this->view($error, 404);
+
+            return $this->handleView($view);
+        }
+
+        $em->remove($task);
+        $em->flush();
+
+        $view = $this->view($task, 200);
+
+        return $this->handleView($view);
     }
 }
